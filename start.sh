@@ -1,24 +1,6 @@
 #!/bin/bash
 # elabftw-docker start script
 
-# generate self-signed certificates for nginx server
-if [ ! -f /etc/nginx/certs/server.crt ]; then
-    openssl req \
-        -new \
-        -newkey rsa:4096 \
-        -days 9999 \
-        -nodes \
-        -x509 \
-        -subj "/C=FR/ST=France/L=Paris/O=elabftw/CN=www.example.com" \
-        -keyout /etc/nginx/certs/server.key \
-        -out /etc/nginx/certs/server.crt
-fi
-
-# generate Diffie-Hellman parameter for DHE ciphersuites
-if [ ! -f /etc/nginx/certs/dhparam.pem ]; then
-    openssl dhparam -outform PEM -out /etc/nginx/certs/dhparam.pem 2048
-fi
-
 # write config file from env var
 db_host=$(grep mysql /etc/hosts | awk '{print $1}')
 if [ -z "$db_host" ]; then
@@ -40,6 +22,26 @@ define('DB_PASSWORD', '${db_password}');
 define('ELAB_ROOT', '${elab_root}');
 EOF
 
+if (! $disable_https); then
+    # generate self-signed certificates for nginx server
+    if [ ! -f /etc/nginx/certs/server.crt ]; then
+        openssl req \
+            -new \
+            -newkey rsa:4096 \
+            -days 9999 \
+            -nodes \
+            -x509 \
+            -subj "/C=FR/ST=France/L=Paris/O=elabftw/CN=www.example.com" \
+            -keyout /etc/nginx/certs/server.key \
+            -out /etc/nginx/certs/server.crt
+    fi
+
+    # generate Diffie-Hellman parameter for DHE ciphersuites
+    if [ ! -f /etc/nginx/certs/dhparam.pem ]; then
+        openssl dhparam -outform PEM -out /etc/nginx/certs/dhparam.pem 2048
+    fi
+fi
+
 # nginx config
 echo "daemon off;" >> /etc/nginx/nginx.conf
 sed -i -e "s/keepalive_timeout\s*65/keepalive_timeout 2/" /etc/nginx/nginx.conf
@@ -54,7 +56,6 @@ if ($disable_https); then
     # activate an HTTP server listening on port 443
     ln -s /etc/nginx/sites-available/elabftw-no-ssl /etc/nginx/sites-enabled/elabftw-no-ssl
     # now we need to disable the checks in elab
-
 else
     # put the right server_name
     sed -i -e "s/localhost/$server_name/" /etc/nginx/sites-available/elabftw-ssl
