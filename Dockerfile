@@ -33,7 +33,7 @@ ADD ./supervisord.conf /etc/supervisord.conf
 ADD ./start.sh /start.sh
 
 # elabftw
-RUN git clone --depth 1 -b next https://github.com/elabftw/elabftw.git /elabftw
+RUN git clone --depth 1 -b master https://github.com/elabftw/elabftw.git /elabftw
 #ADD ./elabftw-next.zip /elabftw.zip
 #RUN unzip /elabftw.zip && mv /elabftw-next /elabftw
 
