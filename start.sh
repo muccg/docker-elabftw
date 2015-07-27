@@ -11,7 +11,6 @@ db_user=${DB_USER:-elabftw}
 db_password=${DB_PASSWORD}
 elab_root='/elabftw/'
 server_name=${SERVER_NAME:-localhost}
-disable_https=${DISABLE_HTTPS:-false}
 
 cat << EOF > /elabftw/config.php
 <?php
@@ -22,46 +21,10 @@ define('DB_PASSWORD', '${db_password}');
 define('ELAB_ROOT', '${elab_root}');
 EOF
 
-if (! $disable_https); then
-    # generate self-signed certificates for nginx server
-    if [ ! -f /etc/nginx/certs/server.crt ]; then
-        openssl req \
-            -new \
-            -newkey rsa:4096 \
-            -days 9999 \
-            -nodes \
-            -x509 \
-            -subj "/C=FR/ST=France/L=Paris/O=elabftw/CN=www.example.com" \
-            -keyout /etc/nginx/certs/server.key \
-            -out /etc/nginx/certs/server.crt
-    fi
-
-    # generate Diffie-Hellman parameter for DHE ciphersuites
-    if [ ! -f /etc/nginx/certs/dhparam.pem ]; then
-        openssl dhparam -outform PEM -out /etc/nginx/certs/dhparam.pem 2048
-    fi
-fi
-
 # nginx config
 echo "daemon off;" >> /etc/nginx/nginx.conf
 sed -i -e "s/keepalive_timeout\s*65/keepalive_timeout 2/" /etc/nginx/nginx.conf
 sed -i -e "s/keepalive_timeout 2/keepalive_timeout 2;\n\tclient_max_body_size 100m/" /etc/nginx/nginx.conf
-# remove the default site
-#rm /etc/nginx-sites-enabled/default
-
-# false by default
-if ($disable_https); then
-    # put the right server_name
-    sed -i -e "s/localhost/$server_name/" /etc/nginx/sites-available/elabftw-no-ssl
-    # activate an HTTP server listening on port 443
-    ln -s /etc/nginx/sites-available/elabftw-no-ssl /etc/nginx/sites-enabled/elabftw-no-ssl
-    # now we need to disable the checks in elab
-else
-    # put the right server_name
-    sed -i -e "s/localhost/$server_name/" /etc/nginx/sites-available/elabftw-ssl
-    # activate an HTTPS server listening on port 443
-    ln -s /etc/nginx/sites-available/elabftw-ssl /etc/nginx/sites-enabled/elabftw-ssl
-fi
 
 # php-fpm config
 sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
