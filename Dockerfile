@@ -9,7 +9,8 @@ MAINTAINER Nicolas CARPi <nicolas.carpi@curie.fr>
 
 # install nginx and php-fpm
 RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx \
     openssl \
     php5-fpm \
@@ -20,8 +21,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     curl \
     git \
     unzip \
-    supervisor && \
+    supervisor \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* &&
     rm -rf /var/lib/apt/lists/*
+RUN env --unset=DEBIAN_FRONTEND
 
 # only HTTPS
 EXPOSE 443
@@ -33,7 +36,7 @@ ADD ./supervisord.conf /etc/supervisord.conf
 ADD ./start.sh /start.sh
 
 # elabftw
-RUN git clone --depth 1 -b master https://github.com/elabftw/elabftw.git /elabftw
+RUN git clone --depth 1 -b 1.1.6 https://github.com/elabftw/elabftw.git /elabftw
 #ADD ./elabftw-next.zip /elabftw.zip
 #RUN unzip /elabftw.zip && mv /elabftw-next /elabftw
 
