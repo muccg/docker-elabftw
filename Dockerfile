@@ -22,8 +22,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     unzip \
     supervisor \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* &&
-    rm -rf /var/lib/apt/lists/*
+    ca-certificates \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN env --unset=DEBIAN_FRONTEND
 
 # only HTTPS
