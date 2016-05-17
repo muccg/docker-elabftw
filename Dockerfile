@@ -1,6 +1,6 @@
 # elabftw in docker, without sql
 FROM ubuntu:14.04
-MAINTAINER Nicolas CARPi <nicolas.carpi@curie.fr>
+MAINTAINER https://github.com/muccg/docker-elabftw
 
 # uncomment for dev build in behind curie proxy
 #ADD ./50proxy /etc/apt/apt.conf.d/50proxy
@@ -36,7 +36,7 @@ ADD ./supervisord.conf /etc/supervisord.conf
 ADD ./start.sh /start.sh
 
 # elabftw
-RUN git clone --depth 1 -b 1.1.8 https://github.com/elabftw/elabftw.git /elabftw
+RUN git clone --depth 1 -b 1.1.8-p2 https://github.com/elabftw/elabftw.git /elabftw
 #ADD ./elabftw-next.zip /elabftw.zip
 #RUN unzip /elabftw.zip && mv /elabftw-next /elabftw
 
