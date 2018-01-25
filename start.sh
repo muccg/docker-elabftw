@@ -9,6 +9,7 @@ fi
 db_name=${DB_NAME:-elabftw}
 db_user=${DB_USER:-elabftw}
 db_password=${DB_PASSWORD}
+secret_key=${SECRET_KEY}
 elab_root='/elabftw/'
 server_name=${SERVER_NAME:-localhost}
 
@@ -19,6 +20,7 @@ define('DB_NAME', '${db_name}');
 define('DB_USER', '${db_user}');
 define('DB_PASSWORD', '${db_password}');
 define('ELAB_ROOT', '${elab_root}');
+define('SECRET_KEY', '${secret_key}');
 EOF
 
 # nginx config
