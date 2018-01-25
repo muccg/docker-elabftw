@@ -27,6 +27,7 @@ EOF
 echo "daemon off;" >> /etc/nginx/nginx.conf
 sed -i -e "s/keepalive_timeout\s*65/keepalive_timeout 2/" /etc/nginx/nginx.conf
 sed -i -e "s/keepalive_timeout 2/keepalive_timeout 2;\n\tclient_max_body_size 100m/" /etc/nginx/nginx.conf
+sed -i -e "s/localhost/$server_name/" /etc/nginx/sites-available/default
 
 # php-fpm config
 sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
